@@ -3,17 +3,18 @@ A Simple Ansible Playbook for Django
 
 This project contains the simplest possible
 [ansible](http://docs.ansible.com/ansible) playbook to provision a server for a
-django project and deploy new versions of the project.
+Django project and deploy new versions of the project.
+
+It has been forked from [technivore/ansible-django](https://github.com/technivore/ansible-django), 
+but several changes were made so that:
+  * It works with MySQL, instead of PostgreSQL.
+  * It works with Ubuntu 16.04 servere, instead of Ubuntu 14.04 server. That means that it
+  uses `systemd` instead of `upstart` for the service configuration.
 
 ### Assumptions
 
-This playbook assumes you have created an Ubuntu 14.04 server and have already
-set up ssh public key authentication on it. Assuming you have provisioned a
-server from a cloud provider such as AWS or Digital Ocean, you should have
-downloaded the private key when generating the server, or specified a keypair
-whose private key you already have saved.
-
-It also assumes you are cool with Postgresql as your database.
+This playbook assumes you have created an Ubuntu 16.04 server and have already
+set up ssh public key authentication on it. 
 
 ### How to use
 
