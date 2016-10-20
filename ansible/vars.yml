@@ -1,15 +1,15 @@
 ---
-# a unix path-friendly name (IE, no spaces or special characters)
-project_name: django_hello
+# A unix path-friendly name (i.e., no spaces or special characters)
+project_name: djbr
 
-# the base path to install to. You should not need to change this.
+# The base path to install to. You should not need to change this.
 install_root: /srv
 
-# the python module path to your project's wsgi file. E.g. for a directory
-# layout like this (assuming `django_hello` is the project_name and top level
-# directory name):
-# django_hello
-# ├── hello
+# The Python module path to your project's wsgi file. E.g. for a directory
+# layout like this (assuming `djbr` is the project_name and the top level
+# directory name is project_site):
+# project_site
+# ├── djbr
 # │   ├── apps
 # │   ├── __init__.py
 # │   ├── settings.py
@@ -17,46 +17,48 @@ install_root: /srv
 # │   └── wsgi.py
 # ├── manage.py
 # └── requirements.txt
-# the correct wsgi_module value would be `hello.wsgi`
-wsgi_module: hello.wsgi
+# The correct wsgi_module value would be `project_site.wsgi`
+wsgi_module: project_site.wsgi
 
-# any directories that need to be added to the PYTHONPATH.
-pythonpath: "{{ install_root }}/{{ project_name }}/hello/apps"
+# Any directories that need to be added to the PYTHONPATH.
+pythonpath: "{{ install_root }}/{{ project_name }}/project_site"
 
-# the git repository URL for the project
-project_repo: git@github.com:technivore/django-hello-world.git
-    
-# a private key that has access to the repository URL
+# The git repository URL for the project
+project_repo: git@github.com:louridas/djbr.git
+
+# A private key that has access to the repository URL
 ssh_private_key: ~/.ssh/id_rsa
 
 # The value of your django project's STATIC_ROOT settings.
 # This will be the directory that django's `collectstatic` management command
 # copies static files to, and it must be an absolute path. The default value 
 # here assumes that STATIC_ROOT is set in your settings.py like so:
-# STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, 'static'))
+# STATIC_ROOT = os.path.abspath(os.path.join(PROJECT_ROOT, 'static'))
 static_root: "{{ install_root }}/{{ project_name }}/static"
 
 # the dns name or names (space separated) for your server
-server_name: django-hello.com www.django-hello.com
+server_name: snf-726601.vm.okeanos.grnet.gr
 
-# database setup. Note that because this playbook doesn't touch the default 
-# postgres pg_hba.conf file, we use local password-based authentication for
-# postgres and thus you need to provide a username and password, and your
-# settings.py MUST set "localhost" or "127.0.0.1" as the HOST value. For
+# Database setup. Note that because this playbook doesn't touch the default 
+# MySQL configuration file, we use local password-based authentication for
+# MySQL and thus you need to provide a username and password, and your
+# settings.py must set "localhost" or "127.0.0.1" as the HOST value. For
 # example, the default settings here assume the following values in
 # settings.py:
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'ENGINE': 'django.db.backends.mysql',
 #         'HOST': 'localhost',
-#         'NAME': 'hello',
-#         'USER': 'hello',
+#         'NAME': 'djbr',
+#         'USER': 'djbr_user',
 #         'PASSWORD': 'changeme',
 #     }
 # }
-db_name: hello
-db_user: hello
+
+db_name: djbr
+db_user: djbr_user
 db_password: changeme
+mysql_root_password: changemetoo
 
 # apt packages, you should not need to change this unless you have packages
 # listed in your requirements.txt that depend on system packages.
@@ -64,10 +66,9 @@ system_packages:
   - git
   - nginx
   - gunicorn
-  - postgresql
-  - postgresql-server-dev-all
-  - python-pip
-  - python-dev
-  - python-psycopg2
+  - mysql-server
+  - python3-pip
+  - python3-dev
+  - libmysqlclient-dev
 
 # vim:ft=ansible:

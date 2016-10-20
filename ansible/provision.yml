@@ -6,26 +6,51 @@
   become: yes
 
   tasks:
-    - name: Install system packages
+    - name: install system packages
       apt: pkg={{ item }} update-cache=yes
       with_items: "{{ system_packages }}"
 
-    - name: Save ssh key to server
-      copy: src={{ ssh_private_key }} dest=/root/.ssh/id_rsa mode=600
+    - name: install python packages
+      pip: name=mysqlclient
+          
+    - name: Save ssh private key to server
+      copy:
+        src: "{{ ssh_private_key }}"
+        dest: /root/.ssh/id_rsa
+        mode: 0600
 
-    - name: Create directory for app
+    - name: create directory for app
       file: path={{ install_root }}/{{ project_name }} state=directory
 
-    - name: make sure postgresql server is running
-      service: name=postgresql state=started
+    - name: make sure mysql server is running
+      service: name=mysql state=started
 
+    - name: set db root password
+      mysql_user:
+        name: root
+        password: "{{ mysql_root_password }}"
+        host: localhost
+        priv: "*.*:ALL,GRANT"
+        state: "present"
+      with_items:
+        - "{{ server_name }}"
+        - 127.0.0.1
+        - ::1
+        - localhost
+      
     - name: create database
-      become_user: postgres
-      postgresql_db: name={{ db_name }}
+      mysql_db:
+        name: "{{ db_name }}"
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
 
     - name: create database user
-      become_user: postgres
-      postgresql_user: db={{ db_name }} name={{ db_user }} password={{ db_password }} priv=ALL
+      mysql_user:
+        login_user: root
+        login_password: "{{ mysql_root_password }}"        
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+        priv: "{{ db_name }}.*:ALL"
 
     - name: remove default nginx site
       file: path=/etc/nginx/sites-enabled/default state=absent

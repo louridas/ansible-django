@@ -4,15 +4,20 @@
     - vars.yml
   gather_facts: false
   become: yes
-
+  
   tasks:
-    - name: Clone/pull project repo
-      git: repo={{ project_repo }} dest={{ install_root }}/{{ project_name }} accept_hostkey=yes
+    - name: clone/pull project repo
+      git:
+        repo: "{{ project_repo }}"
+        dest: "{{ install_root }}/{{ project_name }}"
+        accept_hostkey: yes
       notify:
       - restart gunicorn
-
+      
     - name: install python packages
-      pip: requirements={{ install_root }}/{{ project_name }}/requirements.txt
+      pip:
+        requirements: "{{ install_root }}/{{ project_name }}/requirements.txt"
+        executable: pip3
       notify:
       - restart gunicorn
 
@@ -28,15 +33,19 @@
       django_manage: command=collectstatic app_path={{ install_root }}/{{ project_name }} pythonpath={{ pythonpath }}
 
     - name: copy gunicorn config
-      template: src=files/gunicorn.j2 dest=/etc/init/gunicorn.conf
+      template: src=files/{{ item.src }} dest={{ item.dest }}
+      with_items:
+        - { src: 'gunicorn.service.j2', dest: '/etc/systemd/system/gunicorn.service' }
+        - { src: 'gunicorn.socket.j2', dest: '/etc/systemd/system/gunicorn.socket' }
+        - { src: 'gunicorn.conf.j2', dest: '/usr/lib/tmpfiles.d/gunicorn.conf' }
       notify:
       - restart gunicorn
 
-    - name: make sure nginx server is running
-      service: name=nginx state=started enabled=yes
+    - name: enable ngnix at startup
+      service: name=nginx enabled=yes
 
-    - name: make sure gunicorn server is running
-      service: name=gunicorn state=started enabled=yes
+    - name: enable gunicorn at startup
+      service: name=gunicorn enabled=yes
 
   handlers: 
     - name: restart nginx
