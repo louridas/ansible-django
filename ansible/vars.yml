@@ -65,8 +65,9 @@ mysql_root_password: changemetoo
 system_packages:
   - git
   - nginx
-  - gunicorn
+  - gunicorn3
   - mysql-server
+  - python-pip
   - python3-pip
   - python3-dev
   - libmysqlclient-dev
